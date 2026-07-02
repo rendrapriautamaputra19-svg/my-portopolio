@@ -13,19 +13,26 @@ export default function Home() {
     e.preventDefault();
     setStatus("Sedang mengirim...");
 
-    try {
-      const formElement = e.currentTarget;
-      const formDataInstance = new FormData(formElement);
-      const turnstileToken = formDataInstance.get("cf-turnstile-response");
+    // 🛡️ SECURITY CHECK: Memastikan input tidak dimanipulasi spasi kosong oleh hacker
+    if (
+      !formData.nama.trim() ||
+      !formData.email.trim() ||
+      !formData.whatsapp.trim()
+    ) {
+      setStatus("❌ Semua field wajib diisi dengan benar!");
+      return;
+    }
 
+    try {
       const response = await fetch(
         "https://hook.us2.make.com/ywqx37s1z05rq77f6w56wtfc2gh5q4ig",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ...formData,
-            "cf-turnstile-response": turnstileToken,
+            nama: formData.nama.trim(),
+            email: formData.email.trim(),
+            whatsapp: formData.whatsapp.trim(),
           }),
         },
       );
@@ -34,10 +41,10 @@ export default function Home() {
         setStatus("✅ Data Sukses Terkirim Otomatis ke Make.com!");
         setFormData({ nama: "", email: "", whatsapp: "" });
       } else {
-        setStatus("❌ Gagal mengirim, coba lagi.");
+        setStatus("❌ Gagal mengirim ke server, coba lagi.");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Network Error:", error);
       setStatus("❌ Terjadi kesalahan jaringan.");
     }
   };
@@ -55,7 +62,6 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo & Brand Name */}
           <div className="flex items-center space-x-3">
-            {/* Logo Kustom Otomasi/AI */}
             <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-600 p-[1.5px]">
               <div className="w-full h-full bg-[#0b0c16] rounded-[7px] flex items-center justify-center">
                 <svg
@@ -173,11 +179,7 @@ export default function Home() {
               />
             </div>
 
-            {/* Cloudflare Turnstile */}
-            <div
-              className="cf-turnstile flex justify-center py-2"
-              data-sitekey="0x4AAAAAADtcNccZoRU4vGGs"
-            ></div>
+            {/* 🛑 CLOUDFLARE TURNSTILE SUDAH DIHAPUS DARI SINI */}
 
             {/* Tombol Gradasi Cyan-Purple */}
             <button
